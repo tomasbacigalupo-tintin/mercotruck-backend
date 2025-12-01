@@ -1,0 +1,15 @@
+
+{
+  "name": "mercotruck/backend",
+  "description": "Mercotruck Backend Integration",
+  "autoload": {
+    "psr-4": {
+      "Mercotruck\\\\": "src/"
+    }
+  },
+  "require": {
+    "guzzlehttp/guzzle": "^7.8",
+    "ext-json": "*"
+  }
+}
+

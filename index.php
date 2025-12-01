@@ -39,3 +39,4 @@ try {
     echo json_encode(['error' => $e->getMessage()]);
     exit;
 }
+echo "Deploy test";

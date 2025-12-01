@@ -1,0 +1,51 @@
+name: Deploy Backend to Hostinger
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+          extensions: mbstring, json, curl, zip, openssl
+
+      - name: Install Composer dependencies
+        run: composer install --no-dev --optimize-autoloader
+
+      - name: Prepare deployment package
+        run: zip -r release.zip . -x ".git/*" ".github/*" "mercotruck-backend.zip"
+
+      - name: Upload via SFTP
+        uses: wlixcc/SFTP-Deploy-Action@v1.2.4
+        with:
+          username: ${{ secrets.SFTP_USER }}
+          server: ${{ secrets.SFTP_HOST }}
+          password: ${{ secrets.SFTP_PASS }}
+          local_path: "release.zip"
+          remote_path: ${{ secrets.SFTP_PATH }}
+
+      - name: Unzip on server (Hostinger)
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.SFTP_HOST }}
+          username: ${{ secrets.SFTP_USER }}
+          password: ${{ secrets.SFTP_PASS }}
+          script: |
+            cd ${{ secrets.SFTP_PATH }}
+            unzip -o release.zip
+            rm release.zip
+
+      - name: Test health endpoint
+        run: |
+          sleep 5
+          curl -v https://arkangelcybersec.site/mercotruck-backend/health

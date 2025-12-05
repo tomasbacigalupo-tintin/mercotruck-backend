@@ -1,0 +1,33 @@
+# Environment and secrets
+.env
+.env.local
+.env.*.local
+
+# Config files with secrets (use templates instead)
+src/Config/config.php
+CONFIG_PRODUCTION_TEMPLATE.php
+
+# Logs
+*.log
+logs/
+
+# IDE and OS
+.idea/
+.vscode/
+*.swp
+*.swo
+.DS_Store
+Thumbs.db
+
+# Dependencies
+vendor/
+node_modules/
+
+# Test and temp files
+*.tmp
+*.temp
+FINAL-E2E-REPORT.txt
+
+# PHP specific
+*.cache
+*.phar

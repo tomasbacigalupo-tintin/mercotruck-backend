@@ -1,0 +1,189 @@
+════════════════════════════════════════════════════════════════════════════
+RUTAS API FINALES - REFERENCIA RÁPIDA
+════════════════════════════════════════════════════════════════════════════
+
+🔗 ENDPOINT: GET /health
+─────────────────────────────────────────────────────────────────────────
+Propósito: Health check del servidor
+Método: GET
+Parámetros: Ninguno
+Respuesta:
+  {
+    "status": "ok",
+    "version": "1.0.0",
+    "uptime": 1701619200
+  }
+
+Ejemplo:
+  curl http://localhost:8000/health
+  curl http://localhost:8000/
+
+════════════════════════════════════════════════════════════════════════════
+
+🔗 ENDPOINT: GET /test-odoo
+─────────────────────────────────────────────────────────────────────────
+Propósito: Validar conexión y credenciales Odoo
+Método: GET
+Parámetros: Ninguno
+Respuesta:
+  {
+    "status": "ok",
+    "test": "odoo",
+    "uid": 2,
+    "company": {
+      "id": 1,
+      "name": "Mercotruck S.A."
+    }
+  }
+
+Ejemplo:
+  curl http://localhost:8000/test-odoo
+
+Requiere: Credenciales válidas en src/Config/config.php
+
+════════════════════════════════════════════════════════════════════════════
+
+🔗 ENDPOINT: GET /sync/empresa
+─────────────────────────────────────────────────────────────────────────
+Propósito: Sincronizar empresa desde Airtable a Odoo
+Método: GET
+Parámetros:
+  - id (requerido): ID del registro en Airtable
+
+Respuesta (Crear):
+  {
+    "status": "ok",
+    "action": "created",
+    "partner_id": 123,
+    "airtable_id": "recXXXXXXXXXXXXXX",
+    "name": "Empresa S.A."
+  }
+
+Respuesta (Actualizar):
+  {
+    "status": "ok",
+    "action": "updated",
+    "partner_id": 123,
+    "airtable_id": "recXXXXXXXXXXXXXX",
+    "name": "Empresa S.A."
+  }
+
+Respuesta (Error):
+  {
+    "status": "error",
+    "error": "Falta parámetro id"
+  }
+
+Ejemplo:
+  curl "http://localhost:8000/sync/empresa?id=rec123456789"
+
+Requiere: ID válido de Airtable
+
+════════════════════════════════════════════════════════════════════════════
+
+🔗 ENDPOINT: POST /sync/productos
+─────────────────────────────────────────────────────────────────────────
+Propósito: Crear productos de servicios en Odoo
+Método: POST
+Parámetros: Ninguno (productos hardcodeados)
+Respuesta:
+  {
+    "status": "ok",
+    "creados": [
+      {
+        "name": "Transporte",
+        "id": 456,
+        "status": "created"
+      },
+      {
+        "name": "Flete",
+        "id": 457,
+        "status": "created"
+      },
+      {
+        "name": "Estadía",
+        "id": 458,
+        "status": "created"
+      }
+    ],
+    "total": 3,
+    "errores": null
+  }
+
+Respuesta (Con errores):
+  {
+    "status": "ok",
+    "creados": [
+      { "name": "Transporte", "id": 456, "status": "created" }
+    ],
+    "total": 1,
+    "errores": [
+      {
+        "name": "Flete",
+        "error": "Error al crear producto"
+      }
+    ]
+  }
+
+Ejemplo:
+  curl -X POST http://localhost:8000/sync/productos
+
+════════════════════════════════════════════════════════════════════════════
+
+📊 CÓDIGOS HTTP DE RESPUESTA
+────────────────────────────────────────────────────────────────────────────
+  200 → OK (success)
+  400 → Bad Request (parámetro faltante)
+  404 → Not Found (ruta no existe)
+  500 → Internal Server Error (excepción no manejada)
+
+════════════════════════════════════════════════════════════════════════════
+
+🔐 HEADERS INCLUIDOS EN RESPUESTAS
+────────────────────────────────────────────────────────────────────────────
+  Content-Type: application/json; charset=utf-8
+  X-Content-Type-Options: nosniff
+  X-Frame-Options: DENY
+  Access-Control-Allow-Origin: *
+  Access-Control-Allow-Methods: GET, POST, OPTIONS
+  Access-Control-Allow-Headers: Content-Type, Authorization
+
+════════════════════════════════════════════════════════════════════════════
+
+📌 NOTAS IMPORTANTES
+────────────────────────────────────────────────────────────────────────────
+✓ Todas las respuestas son JSON
+✓ No hay redirecciones ni HTML
+✓ Encoding: UTF-8 sin BOM
+✓ CORS habilitado (evaluar en producción)
+✓ Timeouts: 30 segundos en conexiones externas
+✓ Rate limiting: No implementado (agregar en producción)
+
+════════════════════════════════════════════════════════════════════════════
+
+🧪 TESTING LOCAL
+────────────────────────────────────────────────────────────────────────────
+
+Terminal 1 - Iniciar servidor:
+  cd c:\mercotruck-backend
+  php -S localhost:8000
+
+Terminal 2 - Ejecutar tests:
+  
+  # Health check
+  curl http://localhost:8000/health
+  
+  # Test Odoo
+  curl http://localhost:8000/test-odoo
+  
+  # Test Airtable (requiere ID real)
+  curl "http://localhost:8000/sync/empresa?id=recXXXXXXXXXXXXXX"
+  
+  # Crear productos
+  curl -X POST http://localhost:8000/sync/productos
+
+Terminal 3 - Tests CLI:
+  php test/test-odoo.php
+  php test/test-airtable.php rec123456789
+
+════════════════════════════════════════════════════════════════════════════

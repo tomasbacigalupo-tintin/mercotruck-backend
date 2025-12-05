@@ -24,10 +24,10 @@ jobs:
       - name: Deploy por FTP
         uses: SamKirkland/FTP-Deploy-Action@4.3.3
         with:
-          server: ${{ secrets.FTP_HOST }}
-          username: ${{ secrets.FTP_USER }}
-          password: ${{ secrets.FTP_PASS }}
+          server: ${{ secrets.SFTP_HOST }}
+          username: ${{ secrets.SFTP_USER }}
+          password: ${{ secrets.SFTP_PASS }}
           port: 21
           protocol: ftp
           local-dir: ./
-          server-dir: /public_html/
+          server-dir: ${{ secrets.SFTP_PATH }}
